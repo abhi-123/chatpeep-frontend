@@ -5,9 +5,6 @@ import { Text, View, Pressable, StyleSheet ,SafeAreaView} from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
-import UserMessage from './components/Usermessage';
-import MessageContainer from './components/MessageContainer';
-import ChatScreen from './Screens/ChatScreen';
 import { Link } from 'expo-router';
 
 // Keep the splash screen visible while we fetch resources
@@ -63,15 +60,16 @@ export default function App() {
     {!sessionStarted &&  <View
       style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
       >
-   <Pressable style={styles.button} onPress={() => handleSession(true)}>
-      
-      <Link href="/Screens/ChatScreen"><Text style={styles.text}>Get Started</Text></Link>
+          <Link href="/Screens/ChatScreen" asChild>
+   <Pressable style={styles.button}>
+   <Text style={styles.text}>Get Started</Text>
     </Pressable> 
+    </Link>
     </View> }
-    {sessionStarted && 
+    {/* {sessionStarted && 
    <ChatScreen handleSessionChat={handleSession}></ChatScreen>
     
-    }
+    } */}
     </SafeAreaView>
   );
 }
