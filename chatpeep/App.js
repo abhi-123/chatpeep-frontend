@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState ,React} from 'react';
 import { Text, View, Pressable, StyleSheet ,SafeAreaView} from 'react-native';
 //import Entypo from '@expo/vector-icons/Entypo';
 //import FontAwesome from '@expo/vector-icons/FontAwesome';
@@ -14,6 +14,8 @@ SplashScreen.preventAutoHideAsync();
 export default function App() {
   const [appIsReady, setAppIsReady] = useState(false);
   const [sessionStarted, setSessionStarted] = useState(false);
+ // const [messageText, onMesaageSubmit] = useState({});
+  const [messageList, setMessageList] = useState([]);
 
   useEffect(() => {
     async function prepare() {
@@ -33,6 +35,27 @@ export default function App() {
 
     prepare();
   }, []);
+
+  function handleUserInput(text) {
+  // console.log('in parent app',text);
+  let hours = new Date().getHours(); //Current Hours
+    let min = new Date().getMinutes(); //Current Minutes
+    if (min < 10)
+     {
+      min = "0" + min}
+   let newMessage = {
+    text: text,
+    time : hours + ':' + min
+
+   }
+   setMessageList((prevMessages) => {
+          //  console.log(messageList);
+         //   if(newMessage?.time) {
+            console.log('in first ',prevMessages)
+                return [...prevMessages,newMessage]
+         //   }
+        });
+  }
   const handleSession = (type) => {
     setSessionStarted(type);
   }
@@ -64,13 +87,16 @@ export default function App() {
     {sessionStarted && 
     <View style={{ flex: 1,  justifyContent: 'space-between' , backgroundColor:'#eee'}}> 
     <View style={{ width:'100%',height:100, backgroundColor:'#e6e6e' , alignItems:'flex-end',justifyContent:'flex-end',paddingRight:20,paddingBottom:20}}>
+    {messageList.length> 0 && <Pressable onPress={() => setMessageList([])} >
+        <Ionicons name="refresh" size={24} color="black" />
+      </Pressable> }
       <Pressable onPress={() => handleSession(false)}>
         <Ionicons name="close" size={24} color="black" />
       </Pressable>
       
     </View>
-    <MessageContainer></MessageContainer>
-    <UserMessage></UserMessage>
+    <MessageContainer messageList= {messageList}></MessageContainer>
+    <UserMessage onSubmitHandle={handleUserInput}></UserMessage>
     </View>
     }
     </SafeAreaView>

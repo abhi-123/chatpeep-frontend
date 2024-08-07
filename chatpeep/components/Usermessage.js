@@ -1,17 +1,20 @@
-import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
+import { View, Text, StyleSheet, TextInput, Pressable, TouchableWithoutFeedback } from "react-native";
 import React from "react";
 import Ionicons from '@expo/vector-icons/Ionicons';
+import {Keyboard} from 'react-native'
 
-const UserMessage = (onSubmit) => {
+const UserMessage = ({onSubmitHandle}) => {
   const [text, onChangeText] = React.useState('');
   function onChangeTextHandle(event) {
     onChangeText(event);
-    console.log(event);
+   // console.log(event);
   }
   function handleUserInput() {
-    console.log(text);
+    onChangeText('');
+    onSubmitHandle(text);
   }
   return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
     <View style={styles.userInputContainer}>
       <TextInput
         placeholder = 'Type Your Message...'
@@ -23,6 +26,7 @@ const UserMessage = (onSubmit) => {
         <Text style={styles.text}><Ionicons name="send-sharp" size={24} color="white" /></Text>
       </Pressable>
     </View>
+    </TouchableWithoutFeedback>
   );
 };
 
