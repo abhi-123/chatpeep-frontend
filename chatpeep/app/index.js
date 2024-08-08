@@ -1,20 +1,31 @@
-import { useCallback, useEffect, useState ,React} from 'react';
-import { Text, View, Pressable, StyleSheet ,SafeAreaView} from 'react-native';
+import { useCallback, useEffect, useState, React } from "react";
+import {
+  Text,
+  View,
+  Pressable,
+  StyleSheet,
+  SafeAreaView,
+  TextInput,
+} from "react-native";
 //import Entypo from '@expo/vector-icons/Entypo';
 //import FontAwesome from '@expo/vector-icons/FontAwesome';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import * as SplashScreen from 'expo-splash-screen';
-import * as Font from 'expo-font';
-import { Link } from 'expo-router';
+import Ionicons from "@expo/vector-icons/Ionicons";
+import * as SplashScreen from "expo-splash-screen";
+import * as Font from "expo-font";
+import { Link, Redirect } from "expo-router";
+import { useSession } from "./auth/ctx";
+import { router } from "expo-router";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
+  const { session, signIn } = useSession();
   const [appIsReady, setAppIsReady] = useState(false);
   const [sessionStarted, setSessionStarted] = useState(false);
- // const [messageText, onMesaageSubmit] = useState({});
- 
+  const [showLogin, setShowLogin] = useState(false);
+
+  // const [messageText, onMesaageSubmit] = useState({});
 
   useEffect(() => {
     async function prepare() {
@@ -23,31 +34,36 @@ export default function App() {
         await Font.loadAsync(Ionicons.font);
         // Artificially delay for two seconds to simulate a slow loading
         // experience. Please remove this if you copy and paste the code!
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        await new Promise((resolve) => setTimeout(resolve, 1500));
       } catch (e) {
         console.warn(e);
       } finally {
         // Tell the application to render
         setAppIsReady(true);
-      } 
+      }
     }
 
     prepare();
   }, []);
 
- 
-  function handleSession(type)  {
+  function handleSession(type) {
     setSessionStarted(type);
   }
   const onLayoutRootView = useCallback(async () => {
     if (appIsReady) {
-      console.log(appIsReady)
+      console.log(appIsReady);
       // This tells the splash screen to hide immediately! If we call this after
       // `setAppIsReady`, then we may see a blank screen while the app is
       // loading its initial state and rendering its first pixels. So instead,
       // we hide the splash screen once we know the root view has already
       // performed layout.
       await SplashScreen.hideAsync();
+      if (session) {
+        console.log("in session index.js", session);
+        // On web, static rendering will stop here as the user is not authenticated
+        // in the headless Node process that the pages are rendered in.
+        router.replace("/Screens");
+      }
     }
   }, [appIsReady]);
 
@@ -55,18 +71,48 @@ export default function App() {
     return null;
   }
 
-  return ( 
-    <SafeAreaView  style={{flex: 1}} onLayout={onLayoutRootView}>
-    {!sessionStarted &&  <View
-      style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
-      >
-          <Link href="/Screens/ChatScreen" asChild>
-   <Pressable style={styles.button}>
-   <Text style={styles.text}>Get Started</Text>
-    </Pressable> 
-    </Link>
-    </View> }
-    {/* {sessionStarted && 
+  return (
+    <SafeAreaView style={{ flex: 1 }} onLayout={onLayoutRootView}>
+      {!showLogin && (
+        <View
+          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+        >
+          {/* <Link href="/Screens/ChatScreen" asChild> */}
+          <Pressable style={styles.button} onPress={() => setShowLogin(true)}>
+            <Text style={styles.text}>Get Started</Text>
+          </Pressable>
+          {/* </Link> */}
+        </View>
+      )}
+      {showLogin && (
+        <View
+          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+        >
+          <Text> Login Form </Text>
+          <View>
+            <TextInput placeholder="Email" />
+            <TextInput secureTextEntry={true} placeholder="Password" />
+          </View>
+
+          <Link href="/Screens" asChild>
+            <Pressable
+              style={styles.button}
+              onPress={() => {
+                signIn("abhi");
+              }}
+            >
+              <Text style={styles.text}>Login</Text>
+            </Pressable>
+          </Link>
+
+          {/* <Pressable style={styles.button} onPress={() => {signIn()
+       router.replace('/Screens');
+      }}>
+   <Text style={styles.text}>Login</Text>
+    </Pressable>  */}
+        </View>
+      )}
+      {/* {sessionStarted && 
    <ChatScreen handleSessionChat={handleSession}></ChatScreen>
     
     } */}
@@ -76,19 +122,19 @@ export default function App() {
 
 const styles = StyleSheet.create({
   button: {
-   // alignItems: 'center',
+    // alignItems: 'center',
     //justifyContent: 'center',
     paddingVertical: 12,
     paddingHorizontal: 32,
     borderRadius: 4,
     elevation: 3,
-    backgroundColor: 'black',
+    backgroundColor: "black",
   },
   text: {
     fontSize: 16,
     lineHeight: 21,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     letterSpacing: 0.25,
-    color: 'white',
+    color: "white",
   },
-}); 
+});

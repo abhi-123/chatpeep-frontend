@@ -55,6 +55,7 @@ const styles = StyleSheet.create({
     item: {
       padding: 10,
       margin:5,
+      marginBottom:20,
       //marginVertical: 8,
       //marginHorizontal: 16,
       //width: '90%',

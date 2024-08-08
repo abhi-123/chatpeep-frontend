@@ -10,6 +10,8 @@ const UserMessage = ({onSubmitHandle}) => {
    // console.log(event);
   }
   function handleUserInput() {
+    if(!text)
+    return;
     onChangeText('');
     onSubmitHandle(text);
   }
