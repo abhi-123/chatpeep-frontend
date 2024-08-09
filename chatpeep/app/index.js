@@ -12,9 +12,9 @@ import {
 import Ionicons from "@expo/vector-icons/Ionicons";
 import * as SplashScreen from "expo-splash-screen";
 import * as Font from "expo-font";
-import { Link, Redirect } from "expo-router";
 import { useSession } from "./auth/ctx";
 import { router } from "expo-router";
+import LoginForm from "./components/form";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -51,7 +51,6 @@ export default function App() {
   }
   const onLayoutRootView = useCallback(async () => {
     if (appIsReady) {
-      console.log(appIsReady);
       // This tells the splash screen to hide immediately! If we call this after
       // `setAppIsReady`, then we may see a blank screen while the app is
       // loading its initial state and rendering its first pixels. So instead,
@@ -59,7 +58,6 @@ export default function App() {
       // performed layout.
       await SplashScreen.hideAsync();
       if (session) {
-        console.log("in session index.js", session);
         // On web, static rendering will stop here as the user is not authenticated
         // in the headless Node process that the pages are rendered in.
         router.replace("/Screens");
@@ -85,32 +83,7 @@ export default function App() {
         </View>
       )}
       {showLogin && (
-        <View
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-        >
-          <Text> Login Form </Text>
-          <View>
-            <TextInput placeholder="Email" />
-            <TextInput secureTextEntry={true} placeholder="Password" />
-          </View>
-
-          <Link href="/Screens" asChild>
-            <Pressable
-              style={styles.button}
-              onPress={() => {
-                signIn("abhi");
-              }}
-            >
-              <Text style={styles.text}>Login</Text>
-            </Pressable>
-          </Link>
-
-          {/* <Pressable style={styles.button} onPress={() => {signIn()
-       router.replace('/Screens');
-      }}>
-   <Text style={styles.text}>Login</Text>
-    </Pressable>  */}
-        </View>
+       <LoginForm></LoginForm>
       )}
       {/* {sessionStarted && 
    <ChatScreen handleSessionChat={handleSession}></ChatScreen>

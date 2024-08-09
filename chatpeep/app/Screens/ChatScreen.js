@@ -20,9 +20,7 @@ const ChatScreen = ({ handleSessionChat }) => {
     let hours;
     let min;
     setMessageList((prevMessages) => {
-      //  console.log(messageList);
       //   if(newMessage?.time) {
-      console.log("in first ", prevMessages);
       hours = new Date().getHours(); //Current Hours
       min = new Date().getMinutes(); //Current Minutes
       if (min < 10) {
@@ -67,19 +65,21 @@ const ChatScreen = ({ handleSessionChat }) => {
           width: "100%",
           height: 100,
           backgroundColor: "#e6e6e", 
-         // justifyContent: "space-around",
+          justifyContent: 'space-between',
+          flexDirection:'row'
          
         }}
       >
-            {messageList.length > 0 && (
-          <View style={{alignItems: "flex-start" , width:'20%',paddingLeft:20,height:100,justifyContent:'center'}}>
-          <Pressable onPress={() => setMessageList([])}>
+            
+          <View style={{alignItems: "flex-start" ,height:100,justifyContent:'center',paddingLeft:20}}>
+          {messageList.length > 0 && (<Pressable onPress={() => setMessageList([])}>
             <Ionicons name="refresh" size={24} color="black" />
           </Pressable>
+            )}
           </View>
-        )}
-        <View style={{ alignItems: "flex-end",paddingRight: 20,width:'80%',marginLeft:'20%',
-          justifyContent: 'space-around',height:100}}>
+      
+        <View style={{ alignItems: "flex-end",
+          justifyContent: 'space-around',height:100,paddingRight:20}}>
            <Link href="/Screens/tnc" asChild>
           <Pressable onPress={() => console.log('in clicked')}>
             <Text style={{ fontSize: 18, fontWeight: 600, color: "#2e2e2e" }}>

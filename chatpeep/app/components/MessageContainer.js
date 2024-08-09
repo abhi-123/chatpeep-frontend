@@ -3,13 +3,10 @@ import React, { useState,useEffect } from 'react'
 
 
 const MessageContainer = ({messageList}) => {
-    console.log(messageList);
     // useEffect(() => {
       
     //     setMessageList((prevMessages) => {
-    //         console.log(messageList);
     //         if(newMessage?.time) {
-    //         console.log('in first ',prevMessages)
     //             return [...prevMessages,newMessage]
     //         }
     //     });

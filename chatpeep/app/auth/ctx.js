@@ -28,6 +28,7 @@ export function SessionProvider({ children }) {
       value={{
         signIn: (text) => {
           // Perform sign-in logic here
+          console.log(text)
           setSession(text);
         },
         signOut: () => {
