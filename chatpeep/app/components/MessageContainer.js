@@ -65,7 +65,7 @@ const MessageContainer = ({ messageList }) => {
         />
         </>
       ) : (
-        <Text>{`Welcome ${session.charAt(0).toUpperCase() + session.slice(1)} to the chat session!!!`}</Text>
+        <Text>{`Welcome ${session.charAt(0).toUpperCase() + session.slice(1)} to the chat session!!`}</Text>
         
       )}
     </View>
