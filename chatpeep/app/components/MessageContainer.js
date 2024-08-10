@@ -13,14 +13,12 @@ const MessageContainer = ({ messageList }) => {
 
   useEffect(()=>{   
     if(flatListRef.current){
-      console.log(flatListRef.current)
       flatListRef.current.scrollToEnd({})
       }
     
     }    
   ,[messageList])
  
- console.log(messageList)
   return (
     <View
       style={{
@@ -65,7 +63,7 @@ const MessageContainer = ({ messageList }) => {
         />
         </>
       ) : (
-        <Text>{`Welcome ${session.charAt(0).toUpperCase() + session.slice(1)} to the chat session!!`}</Text>
+        <Text>{session ? `Welcome ${session.charAt(0).toUpperCase() + session.slice(1)} to the chat session!!` : 'User not allowed'} </Text>
         
       )}
     </View>
