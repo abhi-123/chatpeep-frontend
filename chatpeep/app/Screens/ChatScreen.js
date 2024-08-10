@@ -26,13 +26,17 @@ const ChatScreen = ({ handleSessionChat }) => {
       if (min < 10) {
         min = "0" + min;
       }
-      return [
+      let lists = [
         ...prevMessages,
         {
           text: `${text}`,
           time: hours + ":" + min,
         },
+        {
+          loader: true
+        }
       ];
+      return lists;
       //   }
     });
     const botResponse = await generateResponse(text);
@@ -42,6 +46,7 @@ const ChatScreen = ({ handleSessionChat }) => {
       if (min < 10) {
         min = "0" + min;
       }
+     prevMessages.pop();
 
       return [
         ...prevMessages,
@@ -73,7 +78,7 @@ const ChatScreen = ({ handleSessionChat }) => {
             
           <View style={{alignItems: "flex-start" ,height:100,justifyContent:'center',paddingLeft:20}}>
           {messageList.length > 0 && (<Pressable onPress={() => setMessageList([])}>
-            <Ionicons name="refresh" size={24} color="black" />
+            <Ionicons name="refresh" size={18} color="black" />
           </Pressable>
             )}
           </View>
@@ -82,13 +87,13 @@ const ChatScreen = ({ handleSessionChat }) => {
           justifyContent: 'space-around',height:100,paddingRight:20}}>
            <Link href="/Screens/tnc" asChild>
           <Pressable onPress={() => console.log('in clicked')}>
-            <Text style={{ fontSize: 18, fontWeight: 600, color: "#2e2e2e" }}>
+            <Text style={{ fontSize: 16, fontWeight: 600, color: "#2e2e2e" }}>
               Terms & Conditions
             </Text>
           </Pressable>
         </Link>
           <Pressable onPress={() => signOut()}>
-            <Text style={{ fontSize: 18, fontWeight: 600, color: "#2e2e2e" }}>
+            <Text style={{ fontSize: 16, fontWeight: 600, color: "#2e2e2e" }}>
             Sign Out
             </Text>
           </Pressable>

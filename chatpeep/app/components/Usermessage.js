@@ -13,6 +13,7 @@ const UserMessage = ({onSubmitHandle}) => {
     if(!text)
     return;
     onChangeText('');
+    Keyboard.dismiss()
     onSubmitHandle(text);
   }
   return (

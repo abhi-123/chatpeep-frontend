@@ -12,7 +12,7 @@ import { useState } from 'react';
 const LoginForm = () => {
     const { session, signIn } = useSession();
     const [isLoading,setIsLoading] = useState(false);
-  const { handleSubmit, control, reset, formState: { errors } } = useForm({
+  const { handleSubmit, control, reset, formState: { errors }, getValues } = useForm({
     defaultValues: {
       firstName: '',
       lastName: ''
@@ -33,11 +33,11 @@ const LoginForm = () => {
 
     console.log('in login comp',data);
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+    await new Promise((resolve) => setTimeout(resolve, 4000));
     setIsLoading(false);
         signIn(data.firstName);
-        
-        router.replace("/Screens");
+        router.setParams({ name: getValues('firstName') });
+        router.replace(`/Screens`);
 
     
   };
