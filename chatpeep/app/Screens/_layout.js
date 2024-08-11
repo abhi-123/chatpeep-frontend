@@ -1,21 +1,26 @@
 import { Text } from "react-native";
-import { Redirect, Stack ,useNavigation,router} from "expo-router";
+import { Redirect, Stack, useNavigation, router } from "expo-router";
 
 import { useSession } from "../auth/ctx";
 import { useEffect } from "react";
 
 export default function ChatLayout() {
-  const { session, isLoading } = useSession();
+  const { session, isLoading, userCreated } = useSession();
   const navigation = useNavigation();
-
-
 
   useEffect(() => {
     if (!session) {
-   //  navigation.dispatch({ type: 'POP_TO_TOP' });
-     router.replace('/');
+      //  navigation.dispatch({ type: 'POP_TO_TOP' });
+      router.replace("/");
     }
   }, [session]);
+
+  useEffect(() => {
+    if (!userCreated) {
+      //  navigation.dispatch({ type: 'POP_TO_TOP' });
+      router.replace("/");
+    }
+  }, [userCreated]);
 
   // You can keep the splash screen open, or render a loading screen like we do here.
   if (isLoading) {
@@ -24,24 +29,20 @@ export default function ChatLayout() {
 
   // Only require authentication within the (app) group's layout as users
   // need to be able to access the (auth) group and sign in again.
- 
-    // On web, static rendering will stop here as the user is not authenticated
-    // in the headless Node process that the pages are rendered in.
-    //return  <Redirect href="/" />;
-     
- 
-    
+
+  // On web, static rendering will stop here as the user is not authenticated
+  // in the headless Node process that the pages are rendered in.
+  //return  <Redirect href="/" />;
+
   //  return navigation.dispatch({ type: 'POP_TO_TOP' });
-  
 
   // This layout can be deferred because it's not the root layout.
   return (
-    <Stack 
-    >
+    <Stack>
       <Stack.Screen
         name="ChatScreen"
         options={{
-          title: "Chat Window"
+          title: "Chat Window",
         }}
       />
       <Stack.Screen

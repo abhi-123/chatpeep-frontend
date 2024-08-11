@@ -2,10 +2,14 @@ import { useContext, createContext } from "react";
 import { useStorageState } from "./useStorageState";
 
 const AuthContext = createContext({
+  signUp: (text) => null,
   signIn: (text) => null,
   signOut: () => null,
+  deleteUser: () => null,
   session: null,
   isLoading: false,
+  userCreated: null,
+  isLoadingForUser: false,
 });
 
 // This hook can be used to access the user info.
@@ -22,20 +26,34 @@ export function useSession() {
 
 export function SessionProvider({ children }) {
   const [[isLoading, session], setSession] = useStorageState("session");
+  const [[isLoadingForUser, userCreated], setUserCreated] =
+    useStorageState("usercreated");
 
   return (
     <AuthContext.Provider
       value={{
+        signUp: (text) => {
+          // Perform sign-up logic here
+
+          setUserCreated(text);
+        },
         signIn: (text) => {
           // Perform sign-in logic here
-          console.log(text)
+
           setSession(text);
         },
         signOut: () => {
           setSession(null);
         },
+        deleteUser: () => {
+          console.log("in delete user context");
+          setUserCreated(null);
+          setSession(null);
+        },
+        userCreated,
         session,
         isLoading,
+        isLoadingForUser,
       }}
     >
       {children}

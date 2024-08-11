@@ -1,10 +1,8 @@
-import { Stack ,Redirect } from 'expo-router';
-import { SessionProvider } from './auth/ctx';
-import { useSession } from './auth/ctx';
-import { RootSiblingParent } from 'react-native-root-siblings';
+import { Stack, Redirect } from "expo-router";
+import { SessionProvider } from "./auth/ctx";
+import { useSession } from "./auth/ctx";
+import { RootSiblingParent } from "react-native-root-siblings";
 export default function RootLayout() {
-
-
   const { session, isLoading } = useSession();
 
   // You can keep the splash screen open, or render a loading screen like we do here.
@@ -20,31 +18,34 @@ export default function RootLayout() {
     return <Redirect href="/Screens" />;
   }
   return (
-    <SessionProvider >
+    <SessionProvider>
       <RootSiblingParent>
-     <Stack
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: 'black',
-          color: 'white'
-        },
-        headerTintColor: '#fff',
-        headerTitleStyle: {
-          fontWeight: 'bold',
-        },
-      }}>
-      <Stack.Screen name="index" options={{
-         title: 'Home',
-                 
-      }} />
-      <Stack.Screen name="Screens" options={{
-           headerShown: false,
-        }}/>
-      
-      
-    </Stack> 
-    {/* <Slot /> */}
-    </RootSiblingParent>
+        <Stack
+          screenOptions={{
+            headerStyle: {
+              backgroundColor: "black",
+              color: "white",
+            },
+            headerTintColor: "#fff",
+            headerTitleStyle: {
+              fontWeight: "bold",
+            },
+          }}
+        >
+          <Stack.Screen
+            name="index"
+            options={{
+              title: "Home",
+            }}
+          />
+          <Stack.Screen
+            name="Screens"
+            options={{
+              headerShown: false,
+            }}
+          />
+        </Stack>
+      </RootSiblingParent>
     </SessionProvider>
   );
 }

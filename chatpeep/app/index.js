@@ -14,16 +14,17 @@ import * as SplashScreen from "expo-splash-screen";
 import * as Font from "expo-font";
 import { useSession } from "./auth/ctx";
 import { router } from "expo-router";
-import LoginForm from "./components/form";
+import { LoginForm, SignUpForm } from "./components/form";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
-  const { session, signIn } = useSession();
+  const { session, userCreated } = useSession();
   const [appIsReady, setAppIsReady] = useState(false);
   const [sessionStarted, setSessionStarted] = useState(false);
-  const [showLogin, setShowLogin] = useState(false);
+  const [showLoginSignUp, setShowLoginSignup] = useState(false);
+  const [showSignupForm, setshowSignupForm] = useState(false);
 
   // const [messageText, onMesaageSubmit] = useState({});
 
@@ -42,7 +43,6 @@ export default function App() {
         setAppIsReady(true);
       }
     }
-
     prepare();
   }, []);
 
@@ -63,6 +63,10 @@ export default function App() {
         router.setParams({ name: session });
         router.replace("/Screens");
       }
+      console.log(userCreated, "userCreated");
+      if (userCreated) {
+        setshowSignupForm(false);
+      }
     }
   }, [appIsReady]);
 
@@ -72,24 +76,11 @@ export default function App() {
 
   return (
     <SafeAreaView style={{ flex: 1 }} onLayout={onLayoutRootView}>
-      {!showLogin && (
-        <View
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-        >
-          {/* <Link href="/Screens/ChatScreen" asChild> */}
-          <Pressable style={styles.button} onPress={() => setShowLogin(true)}>
-            <Text style={styles.text}>Get Started</Text>
-          </Pressable>
-          {/* </Link> */}
-        </View>
+      {showSignupForm ? (
+        <SignUpForm setshowSignupForm={setshowSignupForm}></SignUpForm>
+      ) : (
+        <LoginForm setshowSignupForm={setshowSignupForm}></LoginForm>
       )}
-      {showLogin && (
-       <LoginForm></LoginForm>
-      )}
-      {/* {sessionStarted && 
-   <ChatScreen handleSessionChat={handleSession}></ChatScreen>
-    
-    } */}
     </SafeAreaView>
   );
 }
