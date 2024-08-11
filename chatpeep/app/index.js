@@ -20,7 +20,7 @@ import { LoginForm, SignUpForm } from "./components/form";
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
-  const { session, userCreated } = useSession();
+  const { session, userCreated, signUp } = useSession();
   const [appIsReady, setAppIsReady] = useState(false);
   const [sessionStarted, setSessionStarted] = useState(false);
   const [showLoginSignUp, setShowLoginSignup] = useState(false);
@@ -58,6 +58,7 @@ export default function App() {
       // performed layout.
       await SplashScreen.hideAsync();
       if (session) {
+        signUp(session);
         // On web, static rendering will stop here as the user is not authenticated
         // in the headless Node process that the pages are rendered in.
         router.setParams({ name: session });
