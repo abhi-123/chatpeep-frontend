@@ -2,7 +2,9 @@ import axios from 'axios';
 //import { ROUTES } from '../constants/routes';
 
 const instance = axios.create({
-	baseURL: `http://192.168.18.90:8080/api/v1`,
+	//baseURL: `http://192.168.18.90:8080/api/v1`,   // For Local Expo GO Development
+	baseURL: `https://chatpeep-backend-production.up.railway.app/api/v1`   // For Railways nodeJS Deploy use
+
 }); 
 
 // instance.interceptors.request.use((req) => {
