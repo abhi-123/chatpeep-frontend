@@ -1,7 +1,0 @@
-- pipeline: "Deploy for testing"
-  events:
-  - type: "PUSH"
-    refs:
-    - "refs/heads/abhidev"
-  fail_on_prepare_env_warning: true
-  cpu: "ARM"
