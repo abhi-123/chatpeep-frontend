@@ -25,6 +25,12 @@ import app from "../../firebaseConfig";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import Modal from "react-native-modal";
 import { signUpApi, signInApi } from "../api/api";
+const speechData = async () => {
+  const speak = await Speech.isSpeakingAsync();
+   if(speak)
+   Speech.stop();
+ }
+ speechData(); 
 
 const LoginForm = ({ setshowSignupForm }) => {
   const { session, userCreated, signIn } = useSession();

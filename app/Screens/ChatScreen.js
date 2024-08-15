@@ -16,6 +16,13 @@ import { Link } from "expo-router";
 import { generateResponse } from "../api/ChatGPTService";
 import { useSession } from "../auth/ctx";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import * as Speech from 'expo-speech';
+const speechData = async () => {
+  const speak = await Speech.isSpeakingAsync();
+   if(speak)
+   Speech.stop();
+ }
+ speechData(); 
 
 const ChatScreen = ({ handleSessionChat }) => {
   const [messageList, setMessageList] = useState([]);
@@ -92,7 +99,12 @@ const ChatScreen = ({ handleSessionChat }) => {
             }}
           >
             {messageList.length > 0 && (
-              <Pressable onPress={() => setMessageList([])}>
+              <Pressable onPress={() =>{
+                 setMessageList([]);
+                 speechData();     
+              }
+              
+              }>
                 <Ionicons name="refresh" size={18} color="black" />
               </Pressable>
             )}
