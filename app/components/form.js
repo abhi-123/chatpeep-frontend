@@ -7,7 +7,12 @@ import {
   Pressable,
   TouchableWithoutFeedback,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView
 } from "react-native";
+import Animated, { FadeInLeft, FadeOutRight} from 'react-native-reanimated';
+
 import { useForm, Controller } from "react-hook-form";
 import Constants from "expo-constants";
 import { useSession } from "../auth/ctx";
@@ -57,7 +62,7 @@ const LoginForm = ({ setshowSignupForm }) => {
 try {
   const response = await signInApi(data);
   const { data: responseData, success , message } = response;
-  console.log(responseData);
+  console.log(response);
   setIsLoading(false);
   if (!success) {
     toast = Toast.show(message, {
@@ -106,14 +111,20 @@ try {
     };
   };
   const handleLogin = () => {
+    console.log('in handleLogin')
     setshowSignupForm(true);
   };
 
   console.log("errors", errors);
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+  //  <ScrollView style={{flex:1}}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{flex:1}}> 
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false} style={{flex:1}}>
       <View style={styles.container}>
+      {/* <Animated.View entering={FadeOutRight} exiting={FadeInLeft}> */}
         <Modal isVisible={isModalVisible}>
           <View
             style={{
@@ -264,8 +275,11 @@ try {
             color="#ec5990"
           />
         </View>
+        {/* </Animated.View> */}
       </View>
     </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
+  //  </ScrollView>
   );
 };
 
@@ -363,8 +377,13 @@ try {
   console.log("errors", errors);
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{flex:1}}> 
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false} style={{flex:1}}>
       <View style={styles.container}>
+       <Animated.View entering={FadeInLeft} exiting={FadeOutRight}>
+
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
@@ -490,8 +509,11 @@ try {
             color="#ec5990"
           />
         </View>
+        </Animated.View>
       </View>
+
     </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 

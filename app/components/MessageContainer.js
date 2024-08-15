@@ -1,4 +1,4 @@
-import { View, Text, FlatList, StyleSheet, StatusBar } from "react-native";
+import { View, Text, FlatList, StyleSheet, StatusBar, Pressable } from "react-native";
 import React, { useState, useEffect, useRef } from "react";
 import ContentLoader, {
   FacebookLoader,
@@ -6,8 +6,16 @@ import ContentLoader, {
   Bullets,
 } from "react-native-easy-content-loader";
 import { useSession } from "../auth/ctx";
-
+import Ionicons from "@expo/vector-icons/Ionicons";
+import * as Speech from 'expo-speech';
+const speechData = async () => {
+ const typeOfSpeech = await Speech.getAvailableVoicesAsync();
+  console.log(typeOfSpeech);
+  
+}
+speechData(); 
 const MessageContainer = ({ messageList }) => {
+  const [isSpeaking, setIsSpeaking] = useState(false)
   const { session } = useSession();
   let flatListRef = useRef();
 
@@ -16,6 +24,29 @@ const MessageContainer = ({ messageList }) => {
       flatListRef.current.scrollToEnd({});
     }
   }, [messageList]);
+
+ const textToSpeech = async (text) => { 
+ 
+  let speak = await Speech.isSpeakingAsync();
+  if(!speak) {
+   Speech.speak(text,
+    {
+      onDone : () => {
+      setIsSpeaking(false);
+
+      }
+    });
+   setIsSpeaking(true);
+}
+else {
+  Speech.stop();
+  setIsSpeaking(false);
+}
+
+  console.log(text)
+
+ // Speech.stop()
+  }
 
   return (
     <View
@@ -46,6 +77,11 @@ const MessageContainer = ({ messageList }) => {
                       ]}
                     >
                       <Text style={styles.title}>{item?.text}</Text>
+                     { index % 2 != 0 && <Pressable style={styles.button} onPress={() => textToSpeech(item?.text)}>
+        <Text style={styles.text}>
+        <Ionicons name={!isSpeaking ? "volume-high-outline" : "volume-mute"} size={24} color="black" />
+        </Text>
+      </Pressable> }
                     </View>
                     <View
                       style={

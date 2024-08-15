@@ -4,6 +4,8 @@ import {
   Pressable,
   TouchableWithoutFeedback,
   Keyboard,
+  KeyboardAvoidingView,
+  Platform
 } from "react-native";
 //import React from 'react'
 import { useState, React } from "react";
@@ -64,9 +66,7 @@ const ChatScreen = ({ handleSessionChat }) => {
       ];
     });
   }
-  return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-     
+  return (  
       <View
         style={{
           flex: 1,
@@ -77,7 +77,7 @@ const ChatScreen = ({ handleSessionChat }) => {
         <View
           style={{
             width: "100%",
-            height: 100,
+            height: 50,
             backgroundColor: "#e6e6e",
             justifyContent: "space-between",
             flexDirection: "row",
@@ -86,7 +86,7 @@ const ChatScreen = ({ handleSessionChat }) => {
           <View
             style={{
               alignItems: "flex-start",
-              height: 100,
+              height: 50,
               justifyContent: "center",
               paddingLeft: 20,
             }}
@@ -102,7 +102,7 @@ const ChatScreen = ({ handleSessionChat }) => {
             style={{
               alignItems: "flex-end",
               justifyContent: "space-around",
-              height: 100,
+              height: 50,
               paddingRight: 20,
             }}
           >
@@ -110,22 +110,17 @@ const ChatScreen = ({ handleSessionChat }) => {
               <Pressable onPress={() => {}}>
                 <Text
                   style={{ fontSize: 16, fontWeight: 600, color: "#2e2e2e" }}
-                >
-                  Terms & Conditions
+                >Usage Policies
+                  {/* <Ionicons name="documents-sharp" size={18} color="black" style={{marginLeft:20}} /> */}
                 </Text>
               </Pressable>
             </Link>
-            <Pressable onPress={() => signOut()}>
-              <Text style={{ fontSize: 16, fontWeight: 600, color: "#2e2e2e" }}>
-                Sign Out
-              </Text>
-            </Pressable>
+           
           </View>
         </View>
         <MessageContainer messageList={messageList}></MessageContainer>
         <UserMessage onSubmitHandle={handleUserInput}></UserMessage>
       </View>
-    </TouchableWithoutFeedback>
   );
 };
 

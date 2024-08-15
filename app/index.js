@@ -6,7 +6,9 @@ import {
   StyleSheet,
   SafeAreaView,
   TextInput,
+  KeyboardAvoidingView,
 } from "react-native";
+import Animated,{ FadeIn, FadeOut} from 'react-native-reanimated';
 //import Entypo from '@expo/vector-icons/Entypo';
 //import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -76,13 +78,21 @@ export default function App() {
   }
 
   return (
+    // <Animated.View entering={FadeIn} exiting={FadeOut} style={{backgroundColor:'red'}}>
+   
     <SafeAreaView style={{ flex: 1 }} onLayout={onLayoutRootView}>
+       
       {showSignupForm ? (
+       
         <SignUpForm setshowSignupForm={setshowSignupForm}></SignUpForm>
+       
       ) : (
         <LoginForm setshowSignupForm={setshowSignupForm}></LoginForm>
       )}
+      
     </SafeAreaView>
+   
+    // </Animated.View>
   );
 }
 

@@ -1,12 +1,14 @@
-import { Text } from "react-native";
+import { Text ,Pressable} from "react-native";
 import { Redirect, Stack, useNavigation, router } from "expo-router";
 
 import { useSession } from "../auth/ctx";
 import { useEffect } from "react";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 export default function ChatLayout() {
-  const { session, isLoading, userCreated } = useSession();
+  const { session, isLoading, signOut } = useSession();
   const navigation = useNavigation();
+  
 
   useEffect(() => {
     if (!session) {
@@ -43,6 +45,9 @@ export default function ChatLayout() {
         name="ChatScreen"
         options={{
           title: "Chat Window",
+          headerRight: () => <Pressable onPress={() => signOut()}>
+          <MaterialIcons name="logout" size={24} color="black" />
+        </Pressable>,
         }}
       />
       <Stack.Screen
