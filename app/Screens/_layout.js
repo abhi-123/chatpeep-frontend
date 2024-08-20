@@ -1,14 +1,13 @@
-import { Text ,Pressable} from "react-native";
+import { Text, Pressable } from "react-native";
 import { Redirect, Stack, useNavigation, router } from "expo-router";
 
 import { useSession } from "../auth/ctx";
 import { useEffect } from "react";
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 export default function ChatLayout() {
   const { session, isLoading, signOut } = useSession();
   const navigation = useNavigation();
-  
 
   useEffect(() => {
     if (!session) {
@@ -16,14 +15,6 @@ export default function ChatLayout() {
       router.replace("/");
     }
   }, [session]);
-
-  // useEffect(() => {
-  //   if (!userCreated) {
-  //     //  navigation.dispatch({ type: 'POP_TO_TOP' });
-  //     router.replace("/");
-  //   }
-  // }, [userCreated]);
-
   // You can keep the splash screen open, or render a loading screen like we do here.
   if (isLoading) {
     return <Text>Loading...</Text>;
@@ -45,9 +36,11 @@ export default function ChatLayout() {
         name="ChatScreen"
         options={{
           title: "Chat Window",
-          headerRight: () => <Pressable onPress={() => signOut()}>
-          <MaterialIcons name="logout" size={24} color="black" />
-        </Pressable>,
+          headerRight: () => (
+            <Pressable onPress={() => signOut()}>
+              <MaterialIcons name="logout" size={24} color="black" />
+            </Pressable>
+          ),
         }}
       />
       <Stack.Screen

@@ -8,7 +8,7 @@ import {
   TextInput,
   KeyboardAvoidingView,
 } from "react-native";
-import Animated,{ FadeIn, FadeOut} from 'react-native-reanimated';
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 //import Entypo from '@expo/vector-icons/Entypo';
 //import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -22,7 +22,7 @@ import { LoginForm, SignUpForm } from "./components/form";
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
-  const { session, userCreated, signUp } = useSession();
+  const { session } = useSession();
   const [appIsReady, setAppIsReady] = useState(false);
   const [sessionStarted, setSessionStarted] = useState(false);
   const [showLoginSignUp, setShowLoginSignup] = useState(false);
@@ -59,17 +59,13 @@ export default function App() {
       // we hide the splash screen once we know the root view has already
       // performed layout.
       await SplashScreen.hideAsync();
-      if (session) {
-       // signUp(session);
+      if (session && session.email) {
+        // signUp(session);
         // On web, static rendering will stop here as the user is not authenticated
         // in the headless Node process that the pages are rendered in.
-        router.setParams({ name: session });
+        router.setParams({ name: session.name });
         router.replace("/Screens");
       }
-      console.log(userCreated, "userCreated");
-      // if (userCreated) {
-      //   setshowSignupForm(false);
-      // }
     }
   }, [appIsReady]);
 
@@ -79,19 +75,15 @@ export default function App() {
 
   return (
     // <Animated.View entering={FadeIn} exiting={FadeOut} style={{backgroundColor:'red'}}>
-   
+
     <SafeAreaView style={{ flex: 1 }} onLayout={onLayoutRootView}>
-       
       {showSignupForm ? (
-       
         <SignUpForm setshowSignupForm={setshowSignupForm}></SignUpForm>
-       
       ) : (
         <LoginForm setshowSignupForm={setshowSignupForm}></LoginForm>
       )}
-      
     </SafeAreaView>
-   
+
     // </Animated.View>
   );
 }

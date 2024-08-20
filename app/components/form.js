@@ -9,9 +9,10 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  ScrollView
+  ScrollView,
+  AsyncStorage,
 } from "react-native";
-import Animated, { FadeInLeft, FadeOutRight} from 'react-native-reanimated';
+import Animated, { FadeInLeft, FadeOutRight } from "react-native-reanimated";
 
 import { useForm, Controller } from "react-hook-form";
 import Constants from "expo-constants";
@@ -25,15 +26,15 @@ import app from "../../firebaseConfig";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import Modal from "react-native-modal";
 import { signUpApi, signInApi } from "../api/api";
+import * as Speech from "expo-speech";
 const speechData = async () => {
   const speak = await Speech.isSpeakingAsync();
-   if(speak)
-   Speech.stop();
- }
- speechData(); 
+  if (speak) Speech.stop();
+};
+speechData();
 
 const LoginForm = ({ setshowSignupForm }) => {
-  const { session, userCreated, signIn } = useSession();
+  const { session, signIn, saveSession } = useSession();
   const [isLoading, setIsLoading] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
   const {
@@ -45,7 +46,7 @@ const LoginForm = ({ setshowSignupForm }) => {
   } = useForm({
     defaultValues: {
       email: "",
-      password: ""
+      password: "",
     },
   });
 
@@ -55,44 +56,34 @@ const LoginForm = ({ setshowSignupForm }) => {
 
   const onSubmit = async (data) => {
     let toast;
-    // if (data.name.toLowerCase() != userCreated?.toLowerCase()) {
-    //   toast = Toast.show("User Not Allowed!\n Please check First Name again", {
-    //     duration: Toast.durations.LONG,
-    //     
-    //   });
-    //   return;
-    // }
-
     setIsLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 2000));
-try {
-  const response = await signInApi(data);
-  const { data: responseData, success , message } = response;
-  console.log(response);
-  setIsLoading(false);
-  if (!success) {
-    toast = Toast.show(message, {
-      duration: Toast.durations.LONG,
-      
-    });
-    return;
-  }
-  signIn(responseData.name);
-  router.setParams({ name: responseData.name });
-  router.replace(`/Screens`);
-  
-} catch (error) {
-  setIsLoading(false);
-  toast = Toast.show(error, {
-    duration: Toast.durations.LONG,
-    
-  });
-  
-}
-
-
-   
- 
+    try {
+      const response = await signInApi(data);
+      const { data: responseData, success, message } = response;
+      console.log(response);
+      setIsLoading(false);
+      if (!success) {
+        toast = Toast.show(message, {
+          duration: Toast.durations.LONG,
+        });
+        return;
+      }
+      signIn({
+        email: responseData.email,
+        name: responseData.name,
+        savedSession: responseData.savedSession,
+      });
+      saveSession(responseData.savedSession);
+      //  console.log(savedSession, "savedSession 1");
+      router.setParams({ name: responseData.name });
+      router.replace(`/Screens`);
+    } catch (error) {
+      setIsLoading(false);
+      toast = Toast.show(error, {
+        duration: Toast.durations.LONG,
+      });
+    }
 
     // const auth = getAuth();
     // signInWithEmailAndPassword(auth, data.name, data.lastName)
@@ -117,94 +108,99 @@ try {
     };
   };
   const handleLogin = () => {
-    console.log('in handleLogin')
+    console.log("in handleLogin");
     setshowSignupForm(true);
   };
 
   console.log("errors", errors);
 
   return (
-  //  <ScrollView style={{flex:1}}>
+    //  <ScrollView style={{flex:1}}>
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={{flex:1}}> 
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false} style={{flex:1}}>
-      <View style={styles.container}>
-      {/* <Animated.View entering={FadeOutRight} exiting={FadeInLeft}> */}
-        <Modal isVisible={isModalVisible}>
-          <View
-            style={{
-              height: "20%",
-              width: "80%",
-              backgroundColor: "#fff",
-              justifyContent: "center",
-              alignItems: "center",
-              margin: "auto",
-            }}
-          >
-            <Text>{`Your Credential is => ${userCreated}`}</Text>
-            <Pressable
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+    >
+      <TouchableWithoutFeedback
+        onPress={Keyboard.dismiss}
+        accessible={false}
+        style={{ flex: 1 }}
+      >
+        <View style={styles.container}>
+          {/* <Animated.View entering={FadeOutRight} exiting={FadeInLeft}> */}
+          <Modal isVisible={isModalVisible}>
+            <View
               style={{
-                marginTop: 20,
-                color: "white",
-                paddingTop: 10,
-                paddingBottom: 10,
-                paddingLeft: 20,
-                paddingRight: 20,
-                backgroundColor: "#ec5990",
-                borderRadius: 4,
+                height: "20%",
+                width: "80%",
+                backgroundColor: "#fff",
+                justifyContent: "center",
+                alignItems: "center",
+                margin: "auto",
               }}
-              onPress={toggleModal}
             >
-              <Text style={styles.text}>Close</Text>
-            </Pressable>
-          </View>
-        </Modal>
-        <Controller
-          control={control}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              placeholder="Email"
-              style={styles.input}
-              onBlur={onBlur}
-              onChangeText={(value) => onChange(value)}
-              value={value}
-            />
+              <Text>{`Your Credential is => ${session?.email}`}</Text>
+              <Pressable
+                style={{
+                  marginTop: 20,
+                  color: "white",
+                  paddingTop: 10,
+                  paddingBottom: 10,
+                  paddingLeft: 20,
+                  paddingRight: 20,
+                  backgroundColor: "#ec5990",
+                  borderRadius: 4,
+                }}
+                onPress={toggleModal}
+              >
+                <Text style={styles.text}>Close</Text>
+              </Pressable>
+            </View>
+          </Modal>
+          <Controller
+            control={control}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                placeholder="Email"
+                style={styles.input}
+                onBlur={onBlur}
+                onChangeText={(value) => onChange(value)}
+                value={value}
+              />
+            )}
+            name="email"
+            rules={{
+              required: { value: true, message: "Email is required" },
+              pattern: {
+                value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+                message: "Invalid email address",
+              },
+            }}
+          />
+          {errors.email && (
+            <Text style={styles.errorText}>{errors.email.message}</Text>
           )}
-          name="email"
-          rules={{
-            required: { value: true, message: "Email is required" },
-            pattern: {
-              value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-              message: "Invalid email address",
-            },
-          }}
-        />
-        {errors.email && (
-          <Text style={styles.errorText}>{errors.email.message}</Text>
-        )}
-         <Controller
-          control={control}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              placeholder="Password"
-              style={styles.input}
-              onBlur={onBlur}
-              onChangeText={(value) => onChange(value)}
-              value={value}
-              secureTextEntry={true}
-            />
+          <Controller
+            control={control}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                placeholder="Password"
+                style={styles.input}
+                onBlur={onBlur}
+                onChangeText={(value) => onChange(value)}
+                value={value}
+                secureTextEntry={true}
+              />
+            )}
+            name="password"
+            rules={{
+              required: { value: true, message: "Password is required" },
+            }}
+          />
+          {errors.password && (
+            <Text style={styles.errorText}>{errors.password.message}</Text>
           )}
-          name="password"
-          rules={{
-            required: { value: true, message: "Password is required" },
-          }}
-        />
-        {errors.password && (
-          <Text style={styles.errorText}>{errors.password.message}</Text>
-        )}
 
-        {/* <Text style={styles.label}>First name </Text>
+          {/* <Text style={styles.label}>First name </Text>
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
@@ -237,60 +233,64 @@ try {
           name="lastName"
         /> */}
 
-        <View style={[styles.button, isLoading ? styles.disabledbutton : ""]}>
-          <Pressable
-            style={{ justifyContent: "center", paddingTop: 10, width: "auto" }}
-            onPress={handleSubmit(onSubmit)}
-            disabled={isLoading}
+          <View style={[styles.button, isLoading ? styles.disabledbutton : ""]}>
+            <Pressable
+              style={{
+                justifyContent: "center",
+                paddingTop: 10,
+                width: "auto",
+              }}
+              onPress={handleSubmit(onSubmit)}
+              disabled={isLoading}
+            >
+              <Text style={styles.text}>
+                {isLoading ? "Authenticating..." : "Login"}
+              </Text>
+            </Pressable>
+          </View>
+
+          <View
+            style={{
+              justifyContent: "center",
+              flexDirection: "row",
+              marginTop: 20,
+            }}
           >
-            <Text style={styles.text}>
-              {isLoading ? "Authenticating..." : "Login"}
-            </Text>
-          </Pressable>
-        </View>
+            <Pressable onPress={toggleModal}>
+              <Text style={{ color: "#ec5990" }}>Forgot Password </Text>
+            </Pressable>
+          </View>
 
-        <View
-          style={{
-            justifyContent: "center",
-            flexDirection: "row",
-            marginTop: 20,
-          }}
-        >
-          <Pressable onPress={toggleModal}>
-            <Text style={{ color: "#ec5990" }}>Forgot Password </Text>
-          </Pressable>
-        </View>
+          <View
+            style={{
+              justifyContent: "center",
+              flexDirection: "row",
+              marginTop: 20,
+            }}
+          >
+            <Text style={{ color: "white" }}>Not a Member? </Text>
+            <Pressable onPress={handleLogin}>
+              <Text style={{ color: "#ec5990" }}>Sign Up </Text>
+            </Pressable>
+          </View>
 
-        <View
-          style={{
-            justifyContent: "center",
-            flexDirection: "row",
-            marginTop: 20,
-          }}
-        >
-          <Text style={{ color: "white" }}>Not a Member? </Text>
-          <Pressable onPress={handleLogin}>
-            <Text style={{ color: "#ec5990" }}>Sign Up </Text>
-          </Pressable>
+          <View style={styles.loader}>
+            <ActivityIndicator
+              animating={isLoading}
+              size="large"
+              color="#ec5990"
+            />
+          </View>
+          {/* </Animated.View> */}
         </View>
-
-        <View style={styles.loader}>
-          <ActivityIndicator
-            animating={isLoading}
-            size="large"
-            color="#ec5990"
-          />
-        </View>
-        {/* </Animated.View> */}
-      </View>
-    </TouchableWithoutFeedback>
+      </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
-  //  </ScrollView>
+    //  </ScrollView>
   );
 };
 
 const SignUpForm = ({ setshowSignupForm }) => {
-  const { userCreated, signUp } = useSession();
+  const { signUp } = useSession();
 
   const [isLoading, setIsLoading] = useState(false);
   const {
@@ -299,7 +299,7 @@ const SignUpForm = ({ setshowSignupForm }) => {
     reset,
     formState: { errors },
     getValues,
-    watch
+    watch,
   } = useForm({
     defaultValues: {
       email: "",
@@ -309,7 +309,7 @@ const SignUpForm = ({ setshowSignupForm }) => {
     },
   });
 
-  let password  = watch("password", "");
+  let password = watch("password", "");
 
   const onSubmit = async (data) => {
     let toast;
@@ -318,38 +318,29 @@ const SignUpForm = ({ setshowSignupForm }) => {
     await new Promise((resolve) => setTimeout(resolve, 2000));
     signUp(data.name);
     setIsLoading(false);
-try {
+    try {
+      const response = await signUpApi(data);
+      const { data: responseData, success, message } = response;
+      console.log(responseData);
+      setIsLoading(false);
+      if (!success) {
+        toast = Toast.show(message, {
+          duration: Toast.durations.LONG,
+        });
+        return;
+      }
+      toast = Toast.show(message, {
+        duration: Toast.durations.LONG,
+      });
 
-  const response = await signUpApi(data);
-  const { data: responseData, success , message } = response;
-  console.log(responseData);
-  setIsLoading(false);
-  if (!success) {
-    toast = Toast.show(message, {
-      duration: Toast.durations.LONG,
-      
-    });
-    return;
-  }
-  toast = Toast.show(message, {
-    duration: Toast.durations.LONG,
-    
-  });
-
-  console.log(response);
-  setshowSignupForm(false);
-  
-} catch (error) {
-  setIsLoading(false);
-  toast = Toast.show(error, {
-    duration: Toast.durations.LONG,
-    
-  });
-  
-}
-
-
-
+      console.log(response);
+      setshowSignupForm(false);
+    } catch (error) {
+      setIsLoading(false);
+      toast = Toast.show(error, {
+        duration: Toast.durations.LONG,
+      });
+    }
 
     // const auth = getAuth();
     // signInWithEmailAndPassword(auth, data.name, data.lastName)
@@ -384,141 +375,155 @@ try {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={{flex:1}}> 
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false} style={{flex:1}}>
-      <View style={styles.container}>
-       <Animated.View entering={FadeInLeft} exiting={FadeOutRight}>
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+    >
+      <TouchableWithoutFeedback
+        onPress={Keyboard.dismiss}
+        accessible={false}
+        style={{ flex: 1 }}
+      >
+        <View style={styles.container}>
+          <Animated.View entering={FadeInLeft} exiting={FadeOutRight}>
+            <Controller
+              control={control}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  placeholder="Email "
+                  style={styles.input}
+                  onBlur={onBlur}
+                  onChangeText={(value) => onChange(value)}
+                  value={value}
+                />
+              )}
+              name="email"
+              rules={{
+                required: { value: true, message: "Email is required" },
+                pattern: {
+                  value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+                  message: "Invalid email address",
+                },
+              }}
+            />
+            {errors.email && (
+              <Text style={styles.errorText}>{errors.email.message}</Text>
+            )}
+            <Controller
+              control={control}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  placeholder="Name"
+                  style={styles.input}
+                  onBlur={onBlur}
+                  onChangeText={(value) => onChange(value)}
+                  value={value}
+                />
+              )}
+              name="name"
+              rules={{
+                required: { value: true, message: "Name is required" },
+              }}
+            />
+            {errors.name && (
+              <Text style={styles.errorText}>{errors.name.message}</Text>
+            )}
 
-        <Controller
-          control={control}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-            placeholder="Email "
-              style={styles.input}
-              onBlur={onBlur}
-              onChangeText={(value) => onChange(value)}
-              value={value}
+            <Controller
+              control={control}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  placeholder="Password"
+                  style={styles.input}
+                  onBlur={onBlur}
+                  onChangeText={(value) => onChange(value)}
+                  value={value}
+                  secureTextEntry={true}
+                />
+              )}
+              name="password"
+              rules={{
+                required: { value: true, message: "Password is required" },
+                minLength: {
+                  value: 8,
+                  message: "Password must have at least 8 characters",
+                },
+              }}
             />
-          )}
-          name="email"
-          rules={{
-            required: { value: true, message: "Email is required" },
-            pattern: {
-              value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-              message: "Invalid email address",
-            },
-          }}
-        />
-        {errors.email && (
-          <Text style={styles.errorText}>{errors.email.message}</Text>
-        )}
-        <Controller
-          control={control}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              placeholder="Name"
-              style={styles.input}
-              onBlur={onBlur}
-              onChangeText={(value) => onChange(value)}
-              value={value}
-            />
-          )}
-          name="name"
-          rules={{
-            required: { value: true, message: "Name is required" },
-          }}
-        />
-        {errors.name && (
-          <Text style={styles.errorText}>{errors.name.message}</Text>
-        )}
-       
-        <Controller
-          control={control}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              placeholder="Password"
-              style={styles.input}
-              onBlur={onBlur}
-              onChangeText={(value) => onChange(value)}
-              value={value}
-              secureTextEntry={true}
-            />
-          )}
-          name="password"
-          rules={{
-            required: { value: true, message: "Password is required" },
-            minLength: {
-              value: 8,
-              message: "Password must have at least 8 characters"
-            }
-          }}
-        />
-        {errors.password && (
-          <Text style={styles.errorText}>{errors.password.message}</Text>
-        )}
-       
-        <Controller
-          control={control}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              placeholder="Confirm Pasword "
-              style={styles.input}
-              onBlur={onBlur}
-              onChangeText={(value) => onChange(value)}
-              value={value}
-              secureTextEntry={true}
-            />
-          )}
-          name="passwordRepeat"
-          rules={{
-            required: { value: true, message: "Confirm Password is required" },
-            validate: (val) => {
-              if (watch('password') != val) {
-                return "Your passwords do no match";
-              }
-            }
-          }}
-        />
-        {errors.passwordRepeat && (
-          <Text style={styles.errorText}>{errors.passwordRepeat.message}</Text>
-        )}
+            {errors.password && (
+              <Text style={styles.errorText}>{errors.password.message}</Text>
+            )}
 
-        <View style={[styles.button, isLoading ? styles.disabledbutton : ""]}>
-          <Pressable
-            style={{ justifyContent: "center", paddingTop: 10, width: "auto" }}
-            onPress={handleSubmit(onSubmit)}
-            disabled={isLoading}
-          >
-            <Text style={styles.text}>
-              {isLoading ? "Creating User..." : "Sign Up"}
-            </Text>
-          </Pressable>
+            <Controller
+              control={control}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  placeholder="Confirm Pasword "
+                  style={styles.input}
+                  onBlur={onBlur}
+                  onChangeText={(value) => onChange(value)}
+                  value={value}
+                  secureTextEntry={true}
+                />
+              )}
+              name="passwordRepeat"
+              rules={{
+                required: {
+                  value: true,
+                  message: "Confirm Password is required",
+                },
+                validate: (val) => {
+                  if (watch("password") != val) {
+                    return "Your passwords do no match";
+                  }
+                },
+              }}
+            />
+            {errors.passwordRepeat && (
+              <Text style={styles.errorText}>
+                {errors.passwordRepeat.message}
+              </Text>
+            )}
+
+            <View
+              style={[styles.button, isLoading ? styles.disabledbutton : ""]}
+            >
+              <Pressable
+                style={{
+                  justifyContent: "center",
+                  paddingTop: 10,
+                  width: "auto",
+                }}
+                onPress={handleSubmit(onSubmit)}
+                disabled={isLoading}
+              >
+                <Text style={styles.text}>
+                  {isLoading ? "Creating User..." : "Sign Up"}
+                </Text>
+              </Pressable>
+            </View>
+            <View
+              style={{
+                justifyContent: "center",
+                flexDirection: "row",
+                marginTop: 20,
+              }}
+            >
+              <Text style={{ color: "white" }}>Already a Member? </Text>
+              <Pressable onPress={handleLogin}>
+                <Text style={{ color: "#ec5990" }}>Log In </Text>
+              </Pressable>
+            </View>
+
+            <View style={styles.loader}>
+              <ActivityIndicator
+                animating={isLoading}
+                size="large"
+                color="#ec5990"
+              />
+            </View>
+          </Animated.View>
         </View>
-        <View
-          style={{
-            justifyContent: "center",
-            flexDirection: "row",
-            marginTop: 20,
-          }}
-        >
-          <Text style={{ color: "white" }}>Already a Member? </Text>
-          <Pressable onPress={handleLogin}>
-            <Text style={{ color: "#ec5990" }}>Log In </Text>
-          </Pressable>
-        </View>
-
-        <View style={styles.loader}>
-          <ActivityIndicator
-            animating={isLoading}
-            size="large"
-            color="#ec5990"
-          />
-        </View>
-        </Animated.View>
-      </View>
-
-    </TouchableWithoutFeedback>
+      </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
 };
@@ -528,7 +533,7 @@ const styles = StyleSheet.create({
     color: "white",
     margin: 20,
     marginLeft: 0,
-    marginRight:0
+    marginRight: 0,
   },
   button: {
     marginTop: 20,
@@ -571,9 +576,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     margin: 20,
     marginLeft: 0,
-    marginRight:0
-
-
+    marginRight: 0,
   },
   loader: {
     //flex: 1,

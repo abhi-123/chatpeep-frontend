@@ -8,13 +8,12 @@ import {
 } from "react-native";
 import React from "react";
 import { useSession } from "../auth/ctx";
-import * as Speech from 'expo-speech';
+import * as Speech from "expo-speech";
 const speechData = async () => {
   const speak = await Speech.isSpeakingAsync();
-   if(speak)
-   Speech.stop();
- }
- speechData(); 
+  if (speak) Speech.stop();
+};
+speechData();
 
 const tnc = () => {
   const { deleteUser } = useSession();

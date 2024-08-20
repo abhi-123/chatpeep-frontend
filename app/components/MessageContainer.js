@@ -1,4 +1,11 @@
-import { View, Text, FlatList, StyleSheet, StatusBar, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  StatusBar,
+  Pressable,
+} from "react-native";
 import React, { useState, useEffect, useRef } from "react";
 import ContentLoader, {
   FacebookLoader,
@@ -7,15 +14,15 @@ import ContentLoader, {
 } from "react-native-easy-content-loader";
 import { useSession } from "../auth/ctx";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import * as Speech from 'expo-speech';
+import * as Speech from "expo-speech";
 const speechData = async () => {
- const typeOfSpeech = await Speech.getAvailableVoicesAsync();
+  const typeOfSpeech = await Speech.getAvailableVoicesAsync();
   console.log(typeOfSpeech);
-  
-}
-speechData(); 
+};
+speechData();
 const MessageContainer = ({ messageList }) => {
-  const [isSpeaking, setIsSpeaking] = useState(false)
+  console.log(messageList, "message  list");
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const { session } = useSession();
   let flatListRef = useRef();
 
@@ -25,28 +32,24 @@ const MessageContainer = ({ messageList }) => {
     }
   }, [messageList]);
 
- const textToSpeech = async (text) => { 
- 
-  let speak = await Speech.isSpeakingAsync();
-  if(!speak) {
-   Speech.speak(text,
-    {
-      onDone : () => {
+  const textToSpeech = async (text) => {
+    let speak = await Speech.isSpeakingAsync();
+    if (!speak) {
+      Speech.speak(text, {
+        onDone: () => {
+          setIsSpeaking(false);
+        },
+      });
+      setIsSpeaking(true);
+    } else {
+      Speech.stop();
       setIsSpeaking(false);
+    }
 
-      }
-    });
-   setIsSpeaking(true);
-}
-else {
-  Speech.stop();
-  setIsSpeaking(false);
-}
+    console.log(text);
 
-  console.log(text)
-
- // Speech.stop()
-  }
+    // Speech.stop()
+  };
 
   return (
     <View
@@ -77,11 +80,24 @@ else {
                       ]}
                     >
                       <Text style={styles.title}>{item?.text}</Text>
-                     { index % 2 != 0 && <Pressable style={styles.button} onPress={() => textToSpeech(item?.text)}>
-        <Text style={styles.text}>
-        <Ionicons name={!isSpeaking ? "volume-high-outline" : "volume-mute"} size={24} color="black" />
-        </Text>
-      </Pressable> }
+                      {index % 2 != 0 && (
+                        <Pressable
+                          style={styles.button}
+                          onPress={() => textToSpeech(item?.text)}
+                        >
+                          <Text style={styles.text}>
+                            <Ionicons
+                              name={
+                                !isSpeaking
+                                  ? "volume-high-outline"
+                                  : "volume-mute"
+                              }
+                              size={24}
+                              color="black"
+                            />
+                          </Text>
+                        </Pressable>
+                      )}
                     </View>
                     <View
                       style={
@@ -99,9 +115,9 @@ else {
         </>
       ) : (
         <Text>
-          {session
+          {session?.email
             ? `Welcome ${
-                session.charAt(0).toUpperCase() + session.slice(1)
+                session?.name.charAt(0).toUpperCase() + session?.name.slice(1)
               } to the chat session!!`
             : "User not allowed"}{" "}
         </Text>
